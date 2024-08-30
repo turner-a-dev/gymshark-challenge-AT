@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Package Optimizer</title>
+    <script>
+        function getPackSizes() {
+            fetch('/getPackSizes')
+                .then(response => response.json())
+                .then(data => {
+                    const sizesList = data.map(size => `<li>${size}</li>`).join('');
+                    document.getElementById('sizesList').innerHTML = `<ul>${sizesList}</ul>`;
+                })
+                .catch(error => alert('Error: ' + error));
+        }
+
+        function addPackSize() {
+            const size = document.getElementById("addSize").value;
+            fetch("/addPackSize", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/text"
+                },
+                body: size
+            })
+            .then(response => response.text())
+            .then(data => alert(data))
+            .catch(error => alert('Error: ' + error));
+        }
+
+        function removePackSize() {
+            const size = document.getElementById("removeSize").value;
+            fetch("/removePackSize", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/text"
+                },
+                body: size
+            })
+            .then(response => response.text())
+            .then(data => alert(data))
+            .catch(error => alert('Error: ' + error));
+        }
+
+        function optimizePacks() {
+            const itemCount = document.getElementById("items").value;
+            fetch(`/getPackages?itemCount=${itemCount}`)
+                .then(response => response.json())
+                .then(data => {
+                    const packsList = Object.entries(data)
+                        .map(([size, count]) => `<li>${size}: ${count}</li>`)
+                        .join('');
+                    document.getElementById('packsList').innerHTML = `<ul>${packsList}</ul>`;
+                })
+                .catch(error => alert('Error: ' + error));
+        }
+    </script>
+</head>
+<body>
+    <h1>Package Optimizer</h1>
+
+    <h2>Enter number of items:</h2>
+    <input type="text" id="items" placeholder="Number of items">
+    <button onclick="optimizePacks()">Optimize Packs</button>
+    <div id="packsList"></div>
+
+    <h2>Add or remove a package size:</h2>
+    <input type="text" id="addSize" placeholder="Add pack size">
+    <button onclick="addPackSize()">Add Pack Size</button>
+
+    <input type="text" id="removeSize" placeholder="Remove pack size">
+    <button onclick="removePackSize()">Remove Pack Size</button>
+
+    <h2>Get Available Package Sizes</h2>
+    <button onclick="getPackSizes()">Get Package Sizes</button>
+    <div id="sizesList"></div>
+</body>
+</html>
